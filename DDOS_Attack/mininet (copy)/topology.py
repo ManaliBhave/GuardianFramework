@@ -4,12 +4,9 @@ from mininet.net import Mininet
 from mininet.link import TCLink
 # from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
-# from mininet.cli import CLI
+from mininet.cli import CLI
 from mininet.node import OVSKernelSwitch, RemoteController
-from time import sleep
-
-from datetime import datetime
-from random import randrange, choice
+# from time import sleep
 
 class MyTopo( Topo ):
 
@@ -82,90 +79,17 @@ class MyTopo( Topo ):
         self.addLink( s3, s4 )
         self.addLink( s4, s5 )
         self.addLink( s5, s6 )
-def ip_generator():
-
-    ip = ".".join(["10","0","0",str(randrange(1,19))])
-    return ip
 
 def startNetwork():
 
-    #print "Starting Network"
     topo = MyTopo()
-    #net = Mininet( topo=topo, host=CPULimitedHost, link=TCLink, controller=None )
-    #net.addController( 'c0', controller=RemoteController, ip='192.168.43.55', port=6653 )
-
-    c0 = RemoteController('c0', ip='192.168.0.101', port=6653)
+    c0 = RemoteController('c0', ip='192.168.47.132', port=6653)
     net = Mininet(topo=topo, link=TCLink, controller=c0)
 
     net.start()
-
-    h1 = net.get('h1')
-    h2 = net.get('h2')
-    h3 = net.get('h3')
-    h4 = net.get('h4')
-    h5 = net.get('h5')
-    h6 = net.get('h6')
-    h7 = net.get('h7')
-    h8 = net.get('h8')
-    h9 = net.get('h9')
-    h10 = net.get('h10')
-    h11 = net.get('h11')
-    h12 = net.get('h12')
-    h13 = net.get('h13')
-    h14 = net.get('h14')
-    h15 = net.get('h15')
-    h16 = net.get('h16')
-    h17 = net.get('h17')
-    h18 = net.get('h18')
-    
-    hosts = [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15, h16, h17, h18]
-    
-    h1.cmd('cd /home/mininet/webserver')
-    h1.cmd('python -m SimpleHTTPServer 80 &')
-    
-    src = choice(hosts)
-    dst = ip_generator()   
-    print("--------------------------------------------------------------------------------")
-    print("Performing ICMP (Ping) Flood")  
-    print("--------------------------------------------------------------------------------")   
-    src.cmd("timeout 20s hping3 -1 -V -d 120 -w 64 -p 80 --flood {}".format(dst))  
-    sleep(100)
-        
-    src = choice(hosts)
-    dst = ip_generator()   
-    print("--------------------------------------------------------------------------------")
-    print("Performing UDP Flood")  
-    print("--------------------------------------------------------------------------------")   
-    src.cmd("timeout 20s hping3 -2 -V -d 120 -w 64 --flood {}".format(dst))    
-    sleep(100)
-    
-    src = choice(hosts)
-    dst = ip_generator()    
-    print("--------------------------------------------------------------------------------")
-    print("Performing TCP-SYN Flood")  
-    print("--------------------------------------------------------------------------------")
-    src.cmd('timeout 20s hping3 -S -V -d 120 -w 64 -p 80 --flood 10.0.0.1')
-    sleep(100)
-    
-    src = choice(hosts)
-    dst = ip_generator()   
-    print("--------------------------------------------------------------------------------")
-    print("Performing LAND Attack")  
-    print("--------------------------------------------------------------------------------")   
-    src.cmd("timeout 20s hping3 -1 -V -d 120 -w 64 --flood -a {} {}".format(dst,dst))
-    sleep(100)  
-    print("--------------------------------------------------------------------------------")
-
-    # CLI(net)
+    CLI(net)
     net.stop()
 
 if __name__ == '__main__':
-    
-    start = datetime.now()
-    
     setLogLevel( 'info' )
     startNetwork()
-    
-    end = datetime.now()
-    
-    print(end-start)
